@@ -7,6 +7,6 @@ SELECT
 FROM 
     metal_bands
 WHERE 
-    LOWER(style) LIKE '%glam%'
+    style LIKE '%Glam Rock%'
 ORDER BY 
     lifespan DESC;
