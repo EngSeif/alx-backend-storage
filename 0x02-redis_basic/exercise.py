@@ -31,6 +31,10 @@ def call_history(method: Callable) -> Callable:
 
 
 def replay(method: Callable):
+    """
+    Prototype: def replay(func: Callable):
+    Displays history of calls of a particular function
+    """
     r = redis.Redis()
     input_key = f"{method.__qualname__}:inputs"
     output_key = f"{method.__qualname__}:outputs"
