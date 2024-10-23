@@ -9,10 +9,6 @@ from typing import Union
 
 
 class Cache:
-    """
-    Cache Class To Store Cache Data
-    into Redis Server
-    """
     def __init__(self) -> None:
         """
         Initialize Redis client and flush the database.
