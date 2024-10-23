@@ -29,7 +29,7 @@ class Cache:
         # Return the key
         return key
 
-    def get(self, key, fn: Optional[Callable] = None):
+    def get(self, key, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
         """
         Get data from Redis and
         apply the conversion function if provided.
@@ -46,6 +46,6 @@ class Cache:
         value = self.get(key)
         return value.decode("utf-8")
 
-    def get_str(self, key: int) -> Optional[int]:
-        """Get data as a string."""
+    def get_int(self, key: int) -> Optional[int]:
+        """Get data as a int."""
         return self.get(key, int)
