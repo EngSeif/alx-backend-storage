@@ -30,25 +30,25 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
-def replay(func: Callable):
-    """
-    Prototype: def replay(func: Callable):
-    Displays history of calls of a particular function
-    """
+def replay(method: Callable):
+    """ Display the history of calls for the given method. """
     r = redis.Redis()
-    key_m = func.__qualname__
-    inp_m = r.lrange("{}:inputs".format(key_m), 0, -1)
-    outp_m = r.lrange("{}:outputs".format(key_m), 0, -1)
-    calls_number = len(inp_m)
-    times_str = 'times'
-    if calls_number == 1:
-        times_str = 'time'
-    fin = '{} was called {} {}:'.format(key_m, calls_number, times_str)
-    print(fin)
-    for k, v in zip(inp_m, outp_m):
-        fin = '{}(*{}) -> {}'.format(
-            key_m, k.decode('utf-8'), v.decode('utf-8'))
-        print(fin)
+    input_key = f"{method.__qualname__}:inputs"
+    output_key = f"{method.__qualname__}:outputs"
+    
+    # Retrieve inputs and outputs from Redis
+    inputs = r.lrange(input_key, 0, -1)
+    outputs = r.lrange(output_key, 0, -1)
+
+    # Print the number of calls
+    print(f"{method.__qualname__} was called {len(inputs)} times:")
+
+    # Loop over inputs and outputs together using zip
+    for input_data, output_data in zip(inputs, outputs):
+        # Decode bytes to string for readability
+        input_tuple = eval(input_data.decode('utf-8'))  # Convert bytes back to tuple
+        output_value = output_data.decode('utf-8')  # Decode output
+        print(f"{method.__qualname__}(*{input_tuple}) -> {output_value}")
 
 
 class Cache:
