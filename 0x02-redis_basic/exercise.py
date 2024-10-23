@@ -5,7 +5,8 @@ Redis basic
 
 import redis
 import uuid
-from typing import Union
+from typing import Callable, Optional, Union
+
 
 class Cache:
     def __init__(self) -> None:
@@ -15,10 +16,9 @@ class Cache:
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store the data in Redis with a random key and return the key.
-        
         Args:
-            data: The data to store in Redis (can be str, bytes, int, or float).
-
+            data: The data to store in Redis
+            (can be str, bytes, int, or float).
         Returns:
             str: The key under which the data is stored.
         """
@@ -28,3 +28,24 @@ class Cache:
         self._redis.set(key, data)
         # Return the key
         return key
+
+    def get(self, key, fn: Optional[Callable] = None):
+        """
+        Get data from Redis and
+        apply the conversion function if provided.
+        """
+        data = self._redis.get(key)
+        if not data:
+            return None
+        if fn:
+            return fn(data)
+        return data
+
+    def get_str(self, key: str) -> Optional[str]:
+        """Get data as a string."""
+        value = self.get(key)
+        return value.decode("utf-8")
+
+    def get_str(self, key: int) -> Optional[int]:
+        """Get data as a string."""
+        return self.get(key, int)
