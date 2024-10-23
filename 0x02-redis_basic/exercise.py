@@ -3,9 +3,19 @@
 Redis basic
 """
 
+from functools import wraps
 import redis
 import uuid
 from typing import Callable, Optional, Union
+
+
+def count_calls(method: Callable) -> Callable:
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -14,6 +24,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store the data in Redis with a random key and return the key.
         Args:
@@ -29,7 +40,8 @@ class Cache:
         # Return the key
         return key
 
-    def get(self, key, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+    def get(self, key, fn: Optional[Callable] = None) -> Union[
+                                                    str, bytes, int, float]:
         """
         Get data from Redis and
         apply the conversion function if provided.
