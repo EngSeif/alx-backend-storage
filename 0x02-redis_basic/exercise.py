@@ -30,24 +30,25 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
-def replay(method: Callable):
+def replay(func: Callable):
     """
     Prototype: def replay(func: Callable):
     Displays history of calls of a particular function
     """
     r = redis.Redis()
-    input_key = f"{method.__qualname__}:inputs"
-    output_key = f"{method.__qualname__}:outputs"
-    func_name = method.__qualname__
-    inputs = r.lrange(input_key, 0, -1)
-    outputs = r.lrange(output_key, 0, -1)
-    calls_num = len(inputs)
+    key_m = func.__qualname__
+    inp_m = r.lrange("{}:inputs".format(key_m), 0, -1)
+    outp_m = r.lrange("{}:outputs".format(key_m), 0, -1)
+    calls_number = len(inp_m)
     times_str = 'times'
-    if calls_num == 1:
+    if calls_number == 1:
         times_str = 'time'
-    print(f"{method.__qualname__} was called {calls_num} {times_str}:")
-    for k, v in zip(inputs, outputs):
-        print(f"{func_name}(*{k.decode('utf-8')}) -> {v.decode('utf-8')}")
+    fin = '{} was called {} {}:'.format(key_m, calls_number, times_str)
+    print(fin)
+    for k, v in zip(inp_m, outp_m):
+        fin = '{}(*{}) -> {}'.format(
+            key_m, k.decode('utf-8'), v.decode('utf-8'))
+        print(fin)
 
 
 class Cache:
